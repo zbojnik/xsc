@@ -160,6 +160,8 @@ void executor::log_result_ok(uint64_t iActualDiff)
 	vMineResults[0].increment();
 }
 
+// do we mine on our wallet or devs?
+// return pool id
 jpsock* executor::pick_pool_by_id(size_t pool_id)
 {
 	assert(pool_id != invalid_pool_id);
@@ -172,8 +174,10 @@ jpsock* executor::pick_pool_by_id(size_t pool_id)
 
 void executor::on_sock_ready(size_t pool_id)
 {
+	// pool id from pick_pool_by_id() is stored in 'pool' variable of 'jpsock*' <- what's that?
 	jpsock* pool = pick_pool_by_id(pool_id);
 
+	// check if pool_id is dev pool_id
 	if(pool_id == dev_pool_id)
 	{
 		if(!pool->cmd_login("", ""))
@@ -186,6 +190,7 @@ void executor::on_sock_ready(size_t pool_id)
 
 	printer::inst()->print_msg(L1, "Connected. Logging in...");
 
+	// from config.txt get wallet address and password
 	if (!pool->cmd_login(jconf::inst()->GetWalletAddress(), jconf::inst()->GetPoolPwd()))
 	{
 		if(!pool->have_sock_error())
